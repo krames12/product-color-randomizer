@@ -5,6 +5,7 @@ import { teal, amber } from "@mui/material/colors";
 
 import ProductColorForm from "./components/ProductColorForm/ProductColorForm";
 import CombinationsList from "./components/CombinationsList/CombinationsList";
+import VariantsSlideout from "./components/VaraintsSlideout/VariantsSlideout";
 
 const theme = createTheme({
   palette: {
@@ -45,6 +46,15 @@ export default function App() {
     setColors([...colors, color]);
   };
 
+  const deleteHandler = (variantName, deletedIndex) => {
+    const variantSetState = variantName == 'colors' ? setColors : setProducts;
+    const variantState = variantName == 'colors' ? colors : products;
+
+    const newState = variantState.filter( (variant, index) => index !== deletedIndex );
+
+    variantSetState([...newState]);
+  }
+
   const handleGenerateCombination = () => {
     const product =
       products[Math.floor(Math.random() * products.length)];
@@ -61,10 +71,15 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md">
-        <Box sx={{ textAlign: "center", py: 4 }}>
-          <ProductColorForm addNewColor={handleColorSubmit} addNewProduct={handleProductSubmit} />
-          <CombinationsList combinations={combinations} onGenerateCombination={handleGenerateCombination} />
+      <Container>
+        <Box sx={{display: "flex", alignItems: "space-between"}}>
+          <Box>
+            <VariantsSlideout colors={colors} products={products} deleteHandler={deleteHandler} />
+          </Box>
+          <Box sx={{ textAlign: "center", py: 4 }}>
+            <ProductColorForm addNewColor={handleColorSubmit} addNewProduct={handleProductSubmit} />
+            <CombinationsList combinations={combinations} onGenerateCombination={handleGenerateCombination} />
+          </Box>
         </Box>
       </Container>
     </ThemeProvider>
