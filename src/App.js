@@ -4,7 +4,6 @@ import { Box, Container, CssBaseline, IconButton } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { teal, amber } from "@mui/material/colors";
 
-import ProductColorForm from "./components/ProductColorForm/ProductColorForm";
 import CombinationsList from "./components/CombinationsList/CombinationsList";
 import VariantsSlideout from "./components/VaraintsSlideout/VariantsSlideout";
 
@@ -40,14 +39,6 @@ export default function App() {
     localStorage.setItem('colors', JSON.stringify(colors));
   }, [colors]);
 
-  const handleProductSubmit = (product) => {
-    setProducts([...products, product]);
-  };
-
-  const handleColorSubmit = (color) => {
-    setColors([...colors, color]);
-  };
-
   const handleSlideoutOpen = () => {
     setVariantSlideoutOpen(true);
   };
@@ -55,10 +46,17 @@ export default function App() {
   const handleSlideoutClose = () => {
     setVariantSlideoutOpen(false);
   };
+  
+  const addHandler = (category, newVariant) => {
+    const variantSetState = category === 'colors' ? setColors : setProducts;
+    const variantState = category === 'colors' ? colors : products;
 
-  const deleteHandler = (variantName, deletedIndex) => {
-    const variantSetState = variantName == 'colors' ? setColors : setProducts;
-    const variantState = variantName == 'colors' ? colors : products;
+    variantSetState([...variantState, newVariant]);
+  }
+
+  const deleteHandler = (category, deletedIndex) => {
+    const variantSetState = category === 'colors' ? setColors : setProducts;
+    const variantState = category === 'colors' ? colors : products;
 
     const newState = variantState.filter( (variant, index) => index !== deletedIndex );
 
@@ -88,13 +86,12 @@ export default function App() {
         <VariantsSlideout 
           colors={colors} 
           products={products} 
+          addHandler={addHandler}
           deleteHandler={deleteHandler} 
           isSlideoutOpen={variantSlideoutOpen}
           handleSlideoutClose={handleSlideoutClose} 
         />
         <Box sx={{ textAlign: "center", py: 4, flexGrow: "1" }}>
-
-          <ProductColorForm addNewColor={handleColorSubmit} addNewProduct={handleProductSubmit} />
           <CombinationsList combinations={combinations} onGenerateCombination={handleGenerateCombination} />
         </Box>
       </Container>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Collapse,
@@ -9,8 +9,10 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  TextField,
  } from "@mui/material";
  import {
+  Add,
   ChevronLeft,
   Delete,
   ExpandLess,
@@ -18,7 +20,14 @@ import {
  } from '@mui/icons-material';
  import { styled } from '@mui/material/styles';
 
-export default function VariantsSlideout({colors, products, deleteHandler, isSlideoutOpen, handleSlideoutClose}) {
+export default function VariantsSlideout({
+  colors, 
+  products, 
+  addHandler, 
+  deleteHandler, 
+  isSlideoutOpen, 
+  handleSlideoutClose
+}) {
   /**
    * @TODO
    * - List the variants (product and color right now) as categories
@@ -35,6 +44,10 @@ export default function VariantsSlideout({colors, products, deleteHandler, isSli
 
   const handleProductCategoryToggleClick = () => {
     setProductOpen(!productOpen);
+  }
+
+  const handleAddNewVariant = (category, variantName) => {
+    addHandler(category.toLowerCase(), variantName);
   }
 
   return (
@@ -62,6 +75,7 @@ export default function VariantsSlideout({colors, products, deleteHandler, isSli
             heading={'Products'}
             isOpen={productOpen}
             toggleHandler={handleProductCategoryToggleClick}
+            addHandler={handleAddNewVariant}
             deleteHandler={deleteHandler}
           />
         )}
@@ -73,6 +87,7 @@ export default function VariantsSlideout({colors, products, deleteHandler, isSli
               heading={'Colors'}
               isOpen={colorOpen}
               toggleHandler={handleColorCategoryToggleClick}
+              addHandler={handleAddNewVariant}
               deleteHandler={deleteHandler}
             />
           </List>
@@ -82,7 +97,9 @@ export default function VariantsSlideout({colors, products, deleteHandler, isSli
   )
 }
 
-function VariantCategory({items, heading, isOpen, toggleHandler, deleteHandler}) {
+function VariantCategory({items, heading, isOpen, toggleHandler, addHandler, deleteHandler}) {
+  const [newVariant, setNewVariant] = useState('');
+
   return (
     <>
       <ListItemButton onClick={toggleHandler}>
@@ -91,6 +108,22 @@ function VariantCategory({items, heading, isOpen, toggleHandler, deleteHandler})
       </ListItemButton>
       <Collapse in={isOpen} timeout="auto" unmountOnExit>
         <List disablePadding>
+          <ListItem key={`add-${heading}-item`} sx={{ pr: 1.5}} >
+            <Box sx={{ display: 'flex', alignItems: 'flex-end' }} component="form" onSubmit={event => {
+              event.preventDefault();
+              addHandler(heading, newVariant);
+              setNewVariant('');
+            }} >
+              <TextField 
+                id="standard-basic" 
+                label={`Add`}
+                onChange={ event => setNewVariant(event.target.value) }
+                value={newVariant}
+                variant="standard"
+              />
+              <Add sx={{ color: 'action.active', my: 0.5, ml: 2 }} />
+            </Box>
+          </ListItem>
           {items && items.map( (item, index) => (
             <ListItem 
               key={index}
@@ -121,3 +154,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
 }));
+
+function AddNewVariant({addHandler}) {
+  return <TextField id="standard-basic" label={`Add`} variant="standard" /> ;
+}
