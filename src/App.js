@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
-import { Box, Container, CssBaseline } from "@mui/material";
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Box, Container, CssBaseline, IconButton } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { teal, amber } from "@mui/material/colors";
 
@@ -29,6 +30,7 @@ export default function App() {
   const [combinations, setCombinations] = useState(
     JSON.parse(localStorage.getItem("combinations")) || []
   );
+  const [variantSlideoutOpen, setVariantSlideoutOpen] =  useState(false);
 
   useEffect(() => {
     localStorage.setItem('products', JSON.stringify(products));
@@ -44,6 +46,14 @@ export default function App() {
 
   const handleColorSubmit = (color) => {
     setColors([...colors, color]);
+  };
+
+  const handleSlideoutOpen = () => {
+    setVariantSlideoutOpen(true);
+  };
+
+  const handleSlideoutClose = () => {
+    setVariantSlideoutOpen(false);
   };
 
   const deleteHandler = (variantName, deletedIndex) => {
@@ -72,14 +82,20 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container>
-        <Box sx={{display: "flex", alignItems: "space-between"}}>
-          <Box>
-            <VariantsSlideout colors={colors} products={products} deleteHandler={deleteHandler} />
-          </Box>
-          <Box sx={{ textAlign: "center", py: 4 }}>
-            <ProductColorForm addNewColor={handleColorSubmit} addNewProduct={handleProductSubmit} />
-            <CombinationsList combinations={combinations} onGenerateCombination={handleGenerateCombination} />
-          </Box>
+        <IconButton onClick={handleSlideoutOpen}>
+          <ChevronRightIcon />
+        </IconButton>
+        <VariantsSlideout 
+          colors={colors} 
+          products={products} 
+          deleteHandler={deleteHandler} 
+          isSlideoutOpen={variantSlideoutOpen}
+          handleSlideoutClose={handleSlideoutClose} 
+        />
+        <Box sx={{ textAlign: "center", py: 4, flexGrow: "1" }}>
+
+          <ProductColorForm addNewColor={handleColorSubmit} addNewProduct={handleProductSubmit} />
+          <CombinationsList combinations={combinations} onGenerateCombination={handleGenerateCombination} />
         </Box>
       </Container>
     </ThemeProvider>
